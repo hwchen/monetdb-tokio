@@ -1,0 +1,12 @@
+[package]
+authors = ["Walther Chen <walther.chen@gmail.com>"]
+name = "monetdb-tokio"
+version = "0.1.0"
+
+[dependencies]
+byteorder = "1.0.0"
+bytes = "0.4.1"
+futures = "0.1.11"
+tokio-io = "0.1.1"
+tokio-proto = "0.1.1"
+tokio-service = "0.1.0"
