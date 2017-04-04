@@ -15,7 +15,7 @@ use byteorder::{ReadBytesExt, WriteBytesExt, LittleEndian};
 use bytes::BytesMut;
 use tokio_io::codec::{Encoder, Decoder};
 
-const MAX_PACKAGE_LENGTH: u16 = (1024 * 8) -2;
+const MAX_PACKAGE_LENGTH: u16 = (1024 * 8) - 2;
 
 #[derive(Debug, Clone)]
 struct Flag {

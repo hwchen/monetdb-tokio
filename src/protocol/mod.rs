@@ -6,8 +6,15 @@
 //! and
 //! https://github.com/snaga/monetdb/blob/master/java/src/nl/cwi/monetdb/mcl/net/MapiSocket.java
 //!
+//! The protocol handles handshake, as well as transport.
 
-use super::codec;
+mod codec;
+
+use std::io;
+use self::codec::MapiCodec;
+use tokio_io::{AsyncRead, AsyncWrite};
+use tokio_io::codec::Framed;
+use tokio_proto::pipeline::ClientProto;
 
 use error;
 use error::MonetError;
@@ -29,30 +36,18 @@ const MSG_TUPLE_NOSLICE: &'static str = "=";
 const MSG_REDIRECT: &'static str = "^";
 const MSG_OK: &'static str = "=OK";
 
-enum State {
-    Init,
-    Ready,
-}
 
-fn parse_error_str(s: &str) -> (MonetError, &str) {
-    use self::MonetError::*;
+pub struct MapiProtocol;
 
-    if s.len() > 6 {
-        if let Some(err) = MonetError::from_mapi_code(&s[0..6]) {
-            return (err, &s[6..]);
-        }
+impl<T: AsyncRead + AsyncWrite + 'static> ClientProto<T> for MapiProtocol {
+    type Request = String;
+    type Response = String;
+
+    type Transport = Framed<T, MapiCodec>;
+    type BindTransport = Result<Self::Transport, io::Error>;
+    fn bind_transport(&self, io: T) -> Self::BindTransport {
+        Ok(io.framed(MapiCodec::new()))
+        // handshake will be performed here.
     }
-    (OperationalError, s)
-}
-
-struct Config {
-    state: State,
-    socket: String,
-    hostname: String,
-    port: usize,
-    username: String,
-    password: String,
-    database: String,
-    language: String,
 }
 
